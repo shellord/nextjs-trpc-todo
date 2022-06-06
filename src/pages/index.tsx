@@ -1,21 +1,37 @@
 import type { NextPage } from "next";
 import { trpc } from "~/utils/trpc";
+import AddTodo from "~/components/AddTodo";
+import Todo from "~/components/Todo";
 
 const Home: NextPage = () => {
-  const health = trpc.useQuery([
-    "todo.hello",
-    {
-      text: "saheen",
+  const trpcContext = trpc.useContext();
+  const addTodo = trpc.useMutation("todo.add", {
+    onSuccess: () => {
+      trpcContext.invalidateQueries(["todo.all"]);
     },
-  ]);
+  });
+  const allTodos = trpc.useQuery(["todo.all"]);
 
-  if (!health.data) {
+  if (!allTodos.data) {
     return <div>Loading...</div>;
   }
 
-  console.log(health.data);
+  const onAddTodo = (text: string) => {
+    addTodo.mutateAsync({
+      text,
+    });
+  };
 
-  return <div>{health.data.greeting}</div>;
+  return (
+    <>
+      <AddTodo onAdd={onAddTodo} />
+      {allTodos.data.map((todo) => (
+        <div key={todo.id}>
+          <Todo text={todo.text} />
+        </div>
+      ))}
+    </>
+  );
 };
 
 export default Home;
