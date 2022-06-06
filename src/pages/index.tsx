@@ -11,6 +11,11 @@ const Home: NextPage = () => {
     },
   });
   const allTodos = trpc.useQuery(["todo.all"]);
+  const deleteTodo = trpc.useMutation("todo.delete", {
+    onSuccess: () => {
+      trpcContext.invalidateQueries(["todo.all"]);
+    },
+  });
 
   if (!allTodos.data) {
     return <div>Loading...</div>;
@@ -22,12 +27,18 @@ const Home: NextPage = () => {
     });
   };
 
+  const onDelete = (id: number) => {
+    deleteTodo.mutateAsync({
+      id,
+    });
+  };
+
   return (
     <>
       <AddTodo onAdd={onAddTodo} />
       {allTodos.data.map((todo) => (
         <div key={todo.id}>
-          <Todo text={todo.text} />
+          <Todo text={todo.text} onDelete={onDelete} id={todo.id} />
         </div>
       ))}
     </>

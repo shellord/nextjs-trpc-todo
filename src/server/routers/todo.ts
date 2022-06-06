@@ -20,4 +20,16 @@ export const todoRouter = createRouter()
     async resolve() {
       return prisma.todo.findMany();
     },
+  })
+  .mutation("delete", {
+    input: z.object({
+      id: z.number(),
+    }),
+    async resolve({ input }) {
+      await prisma.todo.delete({
+        where: {
+          id: input.id,
+        },
+      });
+    },
   });

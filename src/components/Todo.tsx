@@ -1,10 +1,14 @@
 type Props = {
+  id: number;
   text: string;
+  onDelete: (id: number) => void;
 };
-const Todo = ({ text }: Props) => {
+
+const Todo = ({ id, text, onDelete }: Props) => {
   return (
     <div>
-      <p>{text}</p>
+      <p style={{ display: "inline-block" }}>{text}</p>
+      <button onClick={() => onDelete(id)}>X</button>
     </div>
   );
 };
